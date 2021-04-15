@@ -14,3 +14,6 @@ msf exploit(handler) > use auxiliary/scanner/smb/smb_version
 msf auxiliary(smb_version) > set rhosts 192.168.1.1/24
 rhosts => 192.168.1.1/24
 msf auxiliary(smb_version) > run
+
+
+https://anontuttuvenus.medium.com/ceh-practical-exam-review-185ea4cef82a
